@@ -1,0 +1,25 @@
+{
+  "name": "lvgl-playground",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "setup": "bash scripts/setup-deps.sh",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:wasm": "bash wasm/build.sh"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "monaco-editor": "^0.55.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.2"
+  }
+}

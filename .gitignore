@@ -1,0 +1,7 @@
+node_modules
+dist
+lvgl
+.wasm-build
+emsdk
+.DS_Store
+*.tsbuildinfo
