@@ -104,27 +104,86 @@ export function buildLvglAPI(mod: EmscriptenModule): Record<string, unknown> {
       v("lv_obj_align_to", [N,N,N,N,N], [o, base, align, xOfs, yOfs]),
 
     // ── Style setters (helpers use uint32_t for colors to avoid ABI issues) ─
-    lv_obj_set_style_bg_color:     (o: number, c: number, sel: number) => v("helper_set_bg_color",     [N,N,N], [o,c,sel]),
-    lv_obj_set_style_text_color:   (o: number, c: number, sel: number) => v("helper_set_text_color",   [N,N,N], [o,c,sel]),
-    lv_obj_set_style_border_color: (o: number, c: number, sel: number) => v("helper_set_border_color", [N,N,N], [o,c,sel]),
-    lv_obj_set_style_shadow_color: (o: number, c: number, sel: number) => v("helper_set_shadow_color", [N,N,N], [o,c,sel]),
-    lv_obj_set_style_outline_color:(o: number, c: number, sel: number) => v("helper_set_outline_color",[N,N,N], [o,c,sel]),
+    lv_obj_set_style_bg_color:      (o: number, c: number, sel: number) => v("helper_set_bg_color",      [N,N,N], [o,c,sel]),
+    lv_obj_set_style_text_color:    (o: number, c: number, sel: number) => v("helper_set_text_color",    [N,N,N], [o,c,sel]),
+    lv_obj_set_style_border_color:  (o: number, c: number, sel: number) => v("helper_set_border_color",  [N,N,N], [o,c,sel]),
+    lv_obj_set_style_shadow_color:  (o: number, c: number, sel: number) => v("helper_set_shadow_color",  [N,N,N], [o,c,sel]),
+    lv_obj_set_style_outline_color: (o: number, c: number, sel: number) => v("helper_set_outline_color", [N,N,N], [o,c,sel]),
+    lv_obj_set_style_arc_color:     (o: number, c: number, sel: number) => v("helper_set_arc_color",     [N,N,N], [o,c,sel]),
+    lv_obj_set_style_line_color:    (o: number, c: number, sel: number) => v("helper_set_line_color",    [N,N,N], [o,c,sel]),
+    lv_obj_set_style_bg_grad_color: (o: number, c: number, sel: number) => v("helper_set_bg_grad_color", [N,N,N], [o,c,sel]),
+    lv_obj_set_style_img_recolor:   (o: number, c: number, sel: number) => v("helper_set_img_recolor",   [N,N,N], [o,c,sel]),
 
-    lv_obj_set_style_bg_opa:       (o: number, opa: number, sel: number)   => v("lv_obj_set_style_bg_opa",       [N,N,N], [o,opa,sel]),
-    lv_obj_set_style_border_width: (o: number, w: number, sel: number)     => v("lv_obj_set_style_border_width", [N,N,N], [o,w,sel]),
-    lv_obj_set_style_border_opa:   (o: number, opa: number, sel: number)   => v("lv_obj_set_style_border_opa",   [N,N,N], [o,opa,sel]),
-    lv_obj_set_style_radius:       (o: number, r: number, sel: number)     => v("lv_obj_set_style_radius",       [N,N,N], [o,r,sel]),
-    lv_obj_set_style_pad_all:      (o: number, pad: number, sel: number)   => v("helper_set_pad_all",            [N,N,N], [o,pad,sel]), // static inline
-    lv_obj_set_style_pad_top:      (o: number, pad: number, sel: number)   => v("lv_obj_set_style_pad_top",      [N,N,N], [o,pad,sel]),
-    lv_obj_set_style_pad_bottom:   (o: number, pad: number, sel: number)   => v("lv_obj_set_style_pad_bottom",   [N,N,N], [o,pad,sel]),
-    lv_obj_set_style_pad_left:     (o: number, pad: number, sel: number)   => v("lv_obj_set_style_pad_left",     [N,N,N], [o,pad,sel]),
-    lv_obj_set_style_pad_right:    (o: number, pad: number, sel: number)   => v("lv_obj_set_style_pad_right",    [N,N,N], [o,pad,sel]),
-    lv_obj_set_style_pad_gap:      (o: number, pad: number, sel: number)   => v("helper_set_pad_gap",            [N,N,N], [o,pad,sel]), // static inline
-    lv_obj_set_style_shadow_width: (o: number, w: number, sel: number)     => v("lv_obj_set_style_shadow_width", [N,N,N], [o,w,sel]),
-    lv_obj_set_style_text_font:    (o: number, font: number, sel: number)  => v("lv_obj_set_style_text_font",    [N,N,N], [o,font,sel]),
-    lv_obj_set_style_text_align:   (o: number, align: number, sel: number) => v("lv_obj_set_style_text_align",   [N,N,N], [o,align,sel]),
-    lv_obj_set_style_text_letter_space: (o: number, sp: number, sel: number) => v("lv_obj_set_style_text_letter_space", [N,N,N], [o,sp,sel]),
-    lv_obj_set_style_text_line_space: (o: number, sp: number, sel: number)  => v("lv_obj_set_style_text_line_space",  [N,N,N], [o,sp,sel]),
+    // ── General opacity ───────────────────────────────────────────────────
+    lv_obj_set_style_opa:          (o: number, opa: number, sel: number) => v("lv_obj_set_style_opa",          [N,N,N], [o,opa,sel]),
+
+    // ── Background ────────────────────────────────────────────────────────
+    lv_obj_set_style_bg_opa:       (o: number, opa: number, sel: number) => v("lv_obj_set_style_bg_opa",       [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_bg_grad_dir:  (o: number, dir: number, sel: number) => v("lv_obj_set_style_bg_grad_dir",  [N,N,N], [o,dir,sel]),
+    lv_obj_set_style_bg_main_stop: (o: number, v2: number, sel: number)  => v("lv_obj_set_style_bg_main_stop", [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_bg_grad_stop: (o: number, v2: number, sel: number)  => v("lv_obj_set_style_bg_grad_stop", [N,N,N], [o,v2,sel]),
+
+    // ── Border ────────────────────────────────────────────────────────────
+    lv_obj_set_style_border_width: (o: number, w: number, sel: number)   => v("lv_obj_set_style_border_width", [N,N,N], [o,w,sel]),
+    lv_obj_set_style_border_opa:   (o: number, opa: number, sel: number) => v("lv_obj_set_style_border_opa",   [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_radius:       (o: number, r: number, sel: number)   => v("lv_obj_set_style_radius",       [N,N,N], [o,r,sel]),
+
+    // ── Padding ───────────────────────────────────────────────────────────
+    lv_obj_set_style_pad_all:    (o: number, pad: number, sel: number) => v("helper_set_pad_all",          [N,N,N], [o,pad,sel]), // static inline
+    lv_obj_set_style_pad_top:    (o: number, pad: number, sel: number) => v("lv_obj_set_style_pad_top",    [N,N,N], [o,pad,sel]),
+    lv_obj_set_style_pad_bottom: (o: number, pad: number, sel: number) => v("lv_obj_set_style_pad_bottom", [N,N,N], [o,pad,sel]),
+    lv_obj_set_style_pad_left:   (o: number, pad: number, sel: number) => v("lv_obj_set_style_pad_left",   [N,N,N], [o,pad,sel]),
+    lv_obj_set_style_pad_right:  (o: number, pad: number, sel: number) => v("lv_obj_set_style_pad_right",  [N,N,N], [o,pad,sel]),
+    lv_obj_set_style_pad_gap:    (o: number, pad: number, sel: number) => v("helper_set_pad_gap",          [N,N,N], [o,pad,sel]), // static inline
+
+    // ── Shadow ────────────────────────────────────────────────────────────
+    lv_obj_set_style_shadow_width:    (o: number, w: number, sel: number)   => v("lv_obj_set_style_shadow_width",    [N,N,N], [o,w,sel]),
+    lv_obj_set_style_shadow_opa:      (o: number, opa: number, sel: number) => v("lv_obj_set_style_shadow_opa",      [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_shadow_spread:   (o: number, v2: number, sel: number)  => v("lv_obj_set_style_shadow_spread",   [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_shadow_offset_x: (o: number, v2: number, sel: number)  => v("lv_obj_set_style_shadow_offset_x", [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_shadow_offset_y: (o: number, v2: number, sel: number)  => v("lv_obj_set_style_shadow_offset_y", [N,N,N], [o,v2,sel]),
+
+    // ── Outline ───────────────────────────────────────────────────────────
+    lv_obj_set_style_outline_width: (o: number, w: number, sel: number)   => v("lv_obj_set_style_outline_width", [N,N,N], [o,w,sel]),
+    lv_obj_set_style_outline_opa:   (o: number, opa: number, sel: number) => v("lv_obj_set_style_outline_opa",   [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_outline_pad:   (o: number, pad: number, sel: number) => v("lv_obj_set_style_outline_pad",   [N,N,N], [o,pad,sel]),
+
+    // ── Arc style ─────────────────────────────────────────────────────────
+    lv_obj_set_style_arc_width:   (o: number, w: number, sel: number)       => v("lv_obj_set_style_arc_width",   [N,N,N], [o,w,sel]),
+    lv_obj_set_style_arc_opa:     (o: number, opa: number, sel: number)     => v("lv_obj_set_style_arc_opa",     [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_arc_rounded: (o: number, rounded: number, sel: number) => v("lv_obj_set_style_arc_rounded", [N,N,N], [o,rounded,sel]),
+
+    // ── Line style ────────────────────────────────────────────────────────
+    lv_obj_set_style_line_width:     (o: number, w: number, sel: number)       => v("lv_obj_set_style_line_width",     [N,N,N], [o,w,sel]),
+    lv_obj_set_style_line_opa:       (o: number, opa: number, sel: number)     => v("lv_obj_set_style_line_opa",       [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_line_rounded:   (o: number, rounded: number, sel: number) => v("lv_obj_set_style_line_rounded",   [N,N,N], [o,rounded,sel]),
+    lv_obj_set_style_line_dash_width:(o: number, w: number, sel: number)       => v("lv_obj_set_style_line_dash_width",[N,N,N], [o,w,sel]),
+    lv_obj_set_style_line_dash_gap:  (o: number, g: number, sel: number)       => v("lv_obj_set_style_line_dash_gap",  [N,N,N], [o,g,sel]),
+
+    // ── Image style ───────────────────────────────────────────────────────
+    lv_obj_set_style_img_opa:        (o: number, opa: number, sel: number) => v("lv_obj_set_style_img_opa",        [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_img_recolor_opa:(o: number, opa: number, sel: number) => v("lv_obj_set_style_img_recolor_opa",[N,N,N], [o,opa,sel]),
+
+    // ── Text style ────────────────────────────────────────────────────────
+    lv_obj_set_style_text_font:         (o: number, font: number, sel: number)  => v("lv_obj_set_style_text_font",         [N,N,N], [o,font,sel]),
+    lv_obj_set_style_text_align:        (o: number, align: number, sel: number) => v("lv_obj_set_style_text_align",        [N,N,N], [o,align,sel]),
+    lv_obj_set_style_text_letter_space: (o: number, sp: number, sel: number)    => v("lv_obj_set_style_text_letter_space", [N,N,N], [o,sp,sel]),
+    lv_obj_set_style_text_line_space:   (o: number, sp: number, sel: number)    => v("lv_obj_set_style_text_line_space",   [N,N,N], [o,sp,sel]),
+    lv_obj_set_style_text_opa:          (o: number, opa: number, sel: number)   => v("lv_obj_set_style_text_opa",          [N,N,N], [o,opa,sel]),
+    lv_obj_set_style_text_decor:        (o: number, decor: number, sel: number) => v("lv_obj_set_style_text_decor",        [N,N,N], [o,decor,sel]),
+
+    // ── Transform / translate ─────────────────────────────────────────────
+    lv_obj_set_style_translate_x:        (o: number, v2: number, sel: number) => v("lv_obj_set_style_translate_x",        [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_translate_y:        (o: number, v2: number, sel: number) => v("lv_obj_set_style_translate_y",        [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_transform_rotation: (o: number, v2: number, sel: number) => v("lv_obj_set_style_transform_rotation", [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_transform_scale_x:  (o: number, v2: number, sel: number) => v("lv_obj_set_style_transform_scale_x",  [N,N,N], [o,v2,sel]),
+    lv_obj_set_style_transform_scale_y:  (o: number, v2: number, sel: number) => v("lv_obj_set_style_transform_scale_y",  [N,N,N], [o,v2,sel]),
+
+    // ── Size constraints ──────────────────────────────────────────────────
+    lv_obj_set_style_min_width:  (o: number, w: number, sel: number) => v("lv_obj_set_style_min_width",  [N,N,N], [o,w,sel]),
+    lv_obj_set_style_max_width:  (o: number, w: number, sel: number) => v("lv_obj_set_style_max_width",  [N,N,N], [o,w,sel]),
+    lv_obj_set_style_min_height: (o: number, h: number, sel: number) => v("lv_obj_set_style_min_height", [N,N,N], [o,h,sel]),
+    lv_obj_set_style_max_height: (o: number, h: number, sel: number) => v("lv_obj_set_style_max_height", [N,N,N], [o,h,sel]),
 
     // ── Flags / state (v9 renamed clear→remove) ───────────────────────────
     lv_obj_add_flag:    (o: number, flag: number)  => v("lv_obj_add_flag",      [N,N], [o,flag]),
@@ -160,11 +219,12 @@ export function buildLvglAPI(mod: EmscriptenModule): Record<string, unknown> {
     lv_checkbox_set_text: (o: number, t: string)    => v("lv_checkbox_set_text", [N,S], [o,t]),
 
     // ── Arc ───────────────────────────────────────────────────────────────
-    lv_arc_create:    (parent: number)                        => p("lv_arc_create", parent),
-    lv_arc_set_value: (o: number, val: number)                => v("lv_arc_set_value", [N,N], [o,val]),
-    lv_arc_set_range: (o: number, min: number, max: number)   => v("lv_arc_set_range", [N,N,N], [o,min,max]),
-    lv_arc_set_bg_angles: (o: number, start: number, end: number) => v("lv_arc_set_bg_angles", [N,N,N], [o,start,end]),
-    lv_arc_set_angles:    (o: number, start: number, end: number) => v("lv_arc_set_angles",    [N,N,N], [o,start,end]),
+    lv_arc_create:        (parent: number)                            => p("lv_arc_create", parent),
+    lv_arc_set_value:     (o: number, val: number)                    => v("lv_arc_set_value",     [N,N],   [o,val]),
+    lv_arc_set_range:     (o: number, min: number, max: number)       => v("lv_arc_set_range",     [N,N,N], [o,min,max]),
+    lv_arc_set_bg_angles: (o: number, start: number, end: number)     => v("lv_arc_set_bg_angles", [N,N,N], [o,start,end]),
+    lv_arc_set_angles:    (o: number, start: number, end: number)     => v("lv_arc_set_angles",    [N,N,N], [o,start,end]),
+    lv_arc_set_mode:      (o: number, mode: number)                   => v("lv_arc_set_mode",      [N,N],   [o,mode]),
 
     // ── Bar ───────────────────────────────────────────────────────────────
     lv_bar_create:    (parent: number)                          => p("lv_bar_create", parent),
@@ -175,8 +235,17 @@ export function buildLvglAPI(mod: EmscriptenModule): Record<string, unknown> {
     lv_spinner_create: (parent: number) => p("lv_spinner_create", parent),
 
     // ── Dropdown ──────────────────────────────────────────────────────────
-    lv_dropdown_create:    (parent: number)       => p("lv_dropdown_create", parent),
-    lv_dropdown_set_options:(o: number, s: string)=> v("lv_dropdown_set_options", [N,S], [o,s]),
+    lv_dropdown_create:      (parent: number)        => p("lv_dropdown_create", parent),
+    lv_dropdown_set_options: (o: number, s: string)  => v("lv_dropdown_set_options", [N,S], [o,s]),
+    lv_dropdown_get_selected:(o: number)             => p("lv_dropdown_get_selected", o),
+
+    // ── Object getters ────────────────────────────────────────────────────
+    lv_obj_get_width:       (o: number) => p("lv_obj_get_width",  o),
+    lv_obj_get_height:      (o: number) => p("lv_obj_get_height", o),
+    lv_obj_get_x:           (o: number) => p("lv_obj_get_x",      o),
+    lv_obj_get_y:           (o: number) => p("lv_obj_get_y",      o),
+    lv_obj_get_child_count: (o: number) => p("lv_obj_get_child_count", o),
+    lv_obj_get_child:       (o: number, idx: number) => p("lv_obj_get_child", o, idx),
 
     // ── Color helpers ─────────────────────────────────────────────────────
     // lv_color_t is { uint8_t blue, green, red } — a 3-byte BGR struct.
@@ -284,6 +353,40 @@ export function buildLvglAPI(mod: EmscriptenModule): Record<string, unknown> {
     LV_LABEL_LONG_DOT:    1,
     LV_LABEL_LONG_SCROLL: 2,
     LV_LABEL_LONG_CLIP:   3,
+
+    // ── Gradient direction ────────────────────────────────────────────────
+    LV_GRAD_DIR_NONE:  0,
+    LV_GRAD_DIR_VER:   1,
+    LV_GRAD_DIR_HOR:   2,
+
+    // ── Arc mode ──────────────────────────────────────────────────────────
+    LV_ARC_MODE_NORMAL:    0,
+    LV_ARC_MODE_SYMMETRICAL: 1,
+    LV_ARC_MODE_REVERSE:   2,
+
+    // ── Border side ───────────────────────────────────────────────────────
+    LV_BORDER_SIDE_NONE:   0x00,
+    LV_BORDER_SIDE_BOTTOM: 0x01,
+    LV_BORDER_SIDE_TOP:    0x02,
+    LV_BORDER_SIDE_LEFT:   0x04,
+    LV_BORDER_SIDE_RIGHT:  0x08,
+    LV_BORDER_SIDE_FULL:   0x0F,
+    LV_BORDER_SIDE_INTERNAL: 0x10,
+
+    // ── Text decoration ───────────────────────────────────────────────────
+    LV_TEXT_DECOR_NONE:         0x00,
+    LV_TEXT_DECOR_UNDERLINE:    0x01,
+    LV_TEXT_DECOR_STRIKETHROUGH:0x02,
+
+    // ── Direction ─────────────────────────────────────────────────────────
+    LV_DIR_NONE:   0x00,
+    LV_DIR_LEFT:   0x01,
+    LV_DIR_RIGHT:  0x02,
+    LV_DIR_TOP:    0x04,
+    LV_DIR_BOTTOM: 0x08,
+    LV_DIR_HOR:    0x03,
+    LV_DIR_VER:    0x0C,
+    LV_DIR_ALL:    0x0F,
 
     // ── Misc ─────────────────────────────────────────────────────────────
     NULL: 0,

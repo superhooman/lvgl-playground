@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Job 1: compile WASM ────────────────────────────────────────────────────
+  build-wasm:
+    name: Build WASM
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Emscripten ────────────────────────────────────────────────────────
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.73
+          actions-cache-folder: .emsdk-cache
+
+      # ── LVGL source cache ─────────────────────────────────────────────────
+      - name: Cache LVGL source
+        id: cache-lvgl
+        uses: actions/cache@v4
+        with:
+          path: lvgl
+          key: lvgl-v9.2
+
+      - name: Clone LVGL
+        if: steps.cache-lvgl.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth=1 --branch release/v9.2 \
+            https://github.com/lvgl/lvgl.git lvgl
+
+      # ── Compiled LVGL object cache ────────────────────────────────────────
+      - name: Cache WASM build objects
+        uses: actions/cache@v4
+        with:
+          path: .wasm-build
+          key: wasm-objs-${{ hashFiles('wasm/build.sh', 'wasm/helpers.c') }}-lvgl-v9.2
+          restore-keys: |
+            wasm-objs-
+
+      # ── Build ─────────────────────────────────────────────────────────────
+      - name: Build WASM
+        run: bash wasm/build.sh
+
+      # ── Upload artifact for the frontend job ──────────────────────────────
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-output
+          path: |
+            public/lvgl_playground.js
+            public/lvgl_playground.wasm
+          retention-days: 7
+
+  # ── Job 2: TypeScript + Vite build ────────────────────────────────────────
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    needs: build-wasm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-output
+          path: public/
+
+      - name: TypeScript check + Vite build
+        run: pnpm build

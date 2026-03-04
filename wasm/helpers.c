@@ -110,6 +110,22 @@ EMSCRIPTEN_KEEPALIVE
 void helper_set_outline_color(lv_obj_t *obj, uint32_t color, lv_style_selector_t sel)
     { lv_obj_set_style_outline_color(obj, u32_to_color(color), sel); }
 
+EMSCRIPTEN_KEEPALIVE
+void helper_set_arc_color(lv_obj_t *obj, uint32_t color, lv_style_selector_t sel)
+    { lv_obj_set_style_arc_color(obj, u32_to_color(color), sel); }
+
+EMSCRIPTEN_KEEPALIVE
+void helper_set_line_color(lv_obj_t *obj, uint32_t color, lv_style_selector_t sel)
+    { lv_obj_set_style_line_color(obj, u32_to_color(color), sel); }
+
+EMSCRIPTEN_KEEPALIVE
+void helper_set_bg_grad_color(lv_obj_t *obj, uint32_t color, lv_style_selector_t sel)
+    { lv_obj_set_style_bg_grad_color(obj, u32_to_color(color), sel); }
+
+EMSCRIPTEN_KEEPALIVE
+void helper_set_img_recolor(lv_obj_t *obj, uint32_t color, lv_style_selector_t sel)
+    { lv_obj_set_style_img_recolor(obj, u32_to_color(color), sel); }
+
 /* ── Font pointer getters ─────────────────────────────────────────────────── */
 
 #define FONT_GETTER(size) \
