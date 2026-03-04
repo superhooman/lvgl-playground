@@ -1,8 +1,9 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import * as Monaco from "monaco-editor";
-import { initLvgl, runUserApp, type EmscriptenModule } from "./lvgl";
-import { transformCtoJS } from "./transform";
+import { initLvgl, type EmscriptenModule } from "./lvgl";
+import { compileC, type CompilerStatus } from "./compiler";
+import { runCompiledWasm } from "./wasm-runner";
 
 import "./styles/app.css";
 
@@ -38,68 +39,76 @@ void user_app(void)
 }
 `;
 
-// ── Status type ───────────────────────────────────────────────────────────────
-type Status =
+// ── Status ────────────────────────────────────────────────────────────────────
+type AppStatus =
   | { kind: "idle" }
-  | { kind: "loading" }
+  | { kind: "loading";    msg: string }
   | { kind: "running" }
-  | { kind: "error"; msg: string };
+  | { kind: "error";      msg: string };
 
-// ── Component ────────────────────────────────────────────────────────────────
+function statusFromCompiler(s: CompilerStatus): AppStatus {
+  switch (s.stage) {
+    case "init":     return { kind: "loading", msg: "Initialising compiler…" };
+    case "download": return { kind: "loading", msg: "Downloading clang (~100 MB, one-time)…" };
+    case "compile":  return { kind: "loading", msg: "Compiling…" };
+    default:         return { kind: "idle" };
+  }
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const modRef = useRef<EmscriptenModule | null>(null);
-  const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
-  const layoutRef = useRef<HTMLDivElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const modRef       = useRef<EmscriptenModule | null>(null);
+  const editorRef    = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const layoutRef    = useRef<HTMLDivElement>(null);
   const editorPaneRef = useRef<HTMLDivElement>(null);
 
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
-  const [splitPct, setSplitPct] = useState(50); // editor width %
+  const [status, setStatus] = useState<AppStatus>({ kind: "idle" });
+  const [splitPct, setSplitPct] = useState(50);
 
   useEffect(() => {});
 
-  // ── Load WASM once the canvas is mounted ────────────────────────────────
+  // ── Load LVGL WASM once the canvas is mounted ────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    setStatus({ kind: "loading" });
+    setStatus({ kind: "loading", msg: "Loading LVGL…" });
     initLvgl(canvas)
       .then((mod) => {
         modRef.current = mod;
         setStatus({ kind: "idle" });
-        // Auto-run the default example
-        try {
-          const js = transformCtoJS(DEFAULT_CODE);
-          runUserApp(mod, js);
-          setStatus({ kind: "running" });
-        } catch (e) {
-          console.error(e);
-          setStatus({ kind: "error", msg: String(e) });
-        }
+        // Auto-run the default example on startup
+        doRun(mod, DEFAULT_CODE);
       })
       .catch((e: Error) =>
-        setStatus({
-          kind: "error",
-          msg: e.message,
-        }),
+        setStatus({ kind: "error", msg: e.message })
       );
-  }, []); // runs once; canvas ref is stable
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Run handler ──────────────────────────────────────────────────────────
+  // ── Core run logic (compile C → instantiate WASM → call user_app) ───────
+  const doRun = useCallback(
+    async (mod: EmscriptenModule, cCode: string) => {
+      try {
+        const wasmBytes = await compileC(cCode, (s) => {
+          setStatus(statusFromCompiler(s));
+        });
+        await runCompiledWasm(mod, wasmBytes);
+        setStatus({ kind: "running" });
+      } catch (e) {
+        setStatus({ kind: "error", msg: String(e) });
+      }
+    },
+    []
+  );
+
+  // ── Run handler (called by button / Ctrl+Enter) ───────────────────────────
   const handleRun = useCallback(() => {
     const mod = modRef.current;
     if (!mod) return;
-
     const code = editorRef.current?.getValue() ?? DEFAULT_CODE;
-    try {
-      const js = transformCtoJS(code);
-      runUserApp(mod, js);
-      setStatus({ kind: "running" });
-    } catch (e) {
-      setStatus({ kind: "error", msg: String(e) });
-    }
-  }, []);
+    doRun(mod, code);
+  }, [doRun]);
 
   // ── Keyboard shortcut: Ctrl/Cmd + Enter ─────────────────────────────────
   const handleEditorMount = useCallback(
@@ -107,7 +116,7 @@ export default function App() {
       editorRef.current = editor;
       editor.addCommand(
         /* Monaco.KeyMod.CtrlCmd | Monaco.KeyCode.Enter */
-        (1 << 11) | 3, // CtrlCmd=2048, Enter=3 in Monaco keycodes
+        (1 << 11) | 3,
         handleRun,
       );
     },
@@ -116,14 +125,14 @@ export default function App() {
 
   // ── Derived UI state ─────────────────────────────────────────────────────
   const isLoading = status.kind === "loading";
-  const isError = status.kind === "error";
-  const canRun = status.kind !== "loading" && !!modRef.current;
-  const statusText = {
-    idle: "Ready",
-    loading: "Loading WASM…",
-    running: "Running",
-    error: "Error",
-  }[status.kind];
+  const isError   = status.kind === "error";
+  const canRun    = status.kind !== "loading" && !!modRef.current;
+
+  const statusText =
+    status.kind === "loading" ? status.msg :
+    status.kind === "running" ? "Running" :
+    status.kind === "error"   ? "Error" :
+                                "Ready";
 
   return (
     <div className="root">
@@ -134,7 +143,9 @@ export default function App() {
           <span
             className="status"
             style={{
-              color: isError ? "#f85149" : isLoading ? "#58a6ff" : "#3fb950",
+              color: isError   ? "#f85149"
+                   : isLoading ? "#58a6ff"
+                   : "#3fb950",
             }}
           >
             {statusText}
@@ -177,7 +188,9 @@ export default function App() {
         <div className="side">
           <div className="side-header">Preview · 480 × 320</div>
           <div className="canvas-wrapper">
-            {isLoading && <div className="overlay">Loading WASM…</div>}
+            {isLoading && (
+              <div className="overlay">{(status as { kind: "loading"; msg: string }).msg}</div>
+            )}
             {isError && (
               <div className="overlay overlay-error">
                 {(status as { kind: "error"; msg: string }).msg}
@@ -190,9 +203,7 @@ export default function App() {
               width={480}
               height={320}
               className="canvas"
-              style={{
-                opacity: isLoading ? 0 : 1,
-              }}
+              style={{ opacity: isLoading ? 0 : 1 }}
             />
           </div>
         </div>
