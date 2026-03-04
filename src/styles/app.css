@@ -113,3 +113,20 @@
     white-space: pre-wrap;
     font-size: 12px;
 }
+
+/* Compiler stderr output panel below the editor */
+.compile-output {
+    background-color: #1a0a0a;
+    color: #f85149;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 10px 14px;
+    max-height: 180px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    border-top: 1px solid #3a1010;
+    flex-shrink: 0;
+}

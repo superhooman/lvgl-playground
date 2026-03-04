@@ -11,6 +11,9 @@ importers:
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@wasmer/sdk':
+        specifier: ^0.10.0
+        version: 0.10.0
       monaco-editor:
         specifier: ^0.55.1
         version: 0.55.1
@@ -462,6 +465,9 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
+  '@wasmer/sdk@0.10.0':
+    resolution: {integrity: sha512-YQ+s5tGag6P/I8kp9BTH+XhjoS9UFvWiZJvnWEEovClHffhYToKhprWr4UJG7wLP7c/2HQpGkF7ZrjoUvKjdmA==}
+
   baseline-browser-mapping@2.10.0:
     resolution: {integrity: sha512-lIyg0szRfYbiy67j9KN8IyeD7q7hcmqnJ1ddWmNt19ItGpNN64mnllmxUNFIOdOm6by97jlL6wfpTTJrmnjWAA==}
     engines: {node: '>=6.0.0'}
@@ -633,6 +639,9 @@ packages:
         optional: true
       terser:
         optional: true
+
+  web-worker@1.5.0:
+    resolution: {integrity: sha512-RiMReJrTAiA+mBjGONMnjVDP2u3p9R1vkcGz6gDIrOMT3oGuYwX2WRMYI9ipkphSuE5XKEhydbhNEJh4NY9mlw==}
 
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
@@ -976,6 +985,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@wasmer/sdk@0.10.0':
+    dependencies:
+      web-worker: 1.5.0
+
   baseline-browser-mapping@2.10.0: {}
 
   browserslist@4.28.1:
@@ -1138,5 +1151,7 @@ snapshots:
       rollup: 4.59.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  web-worker@1.5.0: {}
 
   yallist@3.1.1: {}
